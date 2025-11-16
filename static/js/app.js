@@ -16,17 +16,17 @@ async function dec() {
     refresh();
 }
 
-async function resetState() {
+async function doReset() {
     await fetch("/api/reset", { method: "POST" });
     refresh();
 }
 
-async function reboot() {
+async function doReboot() {
     await fetch("/api/reboot", { method: "POST" });
     refresh();
 }
 
-async function shutdown() {
+async function doShutdown() {
     await fetch("/api/shutdown", { method: "POST" });
     refresh();
 }

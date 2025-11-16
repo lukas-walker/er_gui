@@ -68,10 +68,8 @@
                 ▼ Decrease
             </button>
 
-            <button onclick="resetState()"
-                class="btn btn-info btn-lg w-full">
-                Reset
-            </button>
+
+            <label for="modal-reset" class="btn btn-info btn-lg w-full">Reset</label>
 
             <!-- Future puzzle buttons will go here -->
 
@@ -83,15 +81,9 @@
         <h2 class="text-2xl font-bold mb-3">System Controls</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            <button onclick="reboot()"
-                class="btn btn-warning btn-lg w-full">
-                Reboot System
-            </button>
+        <label for="modal-reboot" class="btn btn-warning btn-lg w-full">Reboot</label>
 
-            <button onclick="shutdown()"
-                class="btn btn-error btn-lg w-full">
-                Shutdown System
-            </button>
+        <label for="modal-shutdown" class="btn btn-error btn-lg w-full">Shutdown</label>
 
             <!-- Future system buttons -->
 
@@ -123,6 +115,42 @@
         </div>
 
     </section>
+
+    <!-- RESET MODAL -->
+    <input type="checkbox" id="modal-reset" class="modal-toggle" />
+    <div class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Confirm reset?</h3>
+        <div class="modal-action">
+          <label for="modal-reset" class="btn btn-ghost">Cancel</label>
+          <label for="modal-reset" class="btn btn-info" onclick="doReset()">Confirm</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- REBOOT MODAL -->
+    <input type="checkbox" id="modal-reboot" class="modal-toggle" />
+    <div class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Confirm reboot?</h3>
+        <div class="modal-action">
+          <label for="modal-reboot" class="btn btn-ghost">Cancel</label>
+          <label for="modal-reboot" class="btn btn-warning" onclick="doReboot()">Confirm</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHUTDOWN MODAL -->
+    <input type="checkbox" id="modal-shutdown" class="modal-toggle" />
+    <div class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Confirm shutdown?</h3>
+        <div class="modal-action">
+          <label for="modal-shutdown" class="btn btn-ghost">Cancel</label>
+          <label for="modal-shutdown" class="btn btn-error" onclick="doShutdown()">Confirm</label>
+        </div>
+      </div>
+    </div>
 
     <!-- JS -->
     <script src="/static/js/app.js"></script>
