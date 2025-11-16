@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Escape Room Control Panel</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 18px; }
+        #round { font-size: 32px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<h1>Escape Room Control Panel</h1>
+
+<div id="round">Loading...</div>
+
+<button onclick="inc()">▲ Increase</button>
+<button onclick="dec()">▼ Decrease</button>
+
+<script>
+async function refresh() {
+    const res = await fetch("/api/state");
+    const data = await res.json();
+    document.getElementById("round").innerText = data.round;
+}
+
+async function inc() {
+    await fetch("/api/inc", { method: "POST" });
+    refresh();
+}
+
+async function dec() {
+    await fetch("/api/dec", { method: "POST" });
+    refresh();
+}
+
+refresh();
+setInterval(refresh, 1000);
+</script>
+
+</body>
+</html>
