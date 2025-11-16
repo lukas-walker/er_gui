@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Escape Room Control Panel</title>
+
+    <!-- Tailwind + DaisyUI CDN -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/daisyui@4.10.0/dist/full.min.css"
+        rel="stylesheet"
+        type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+
+<body class="min-h-screen bg-base-300 text-base-content p-4">
+
+    <!-- Header -->
+    <header class="mb-6 text-center">
+        <h1 class="text-4xl font-bold mb-2">Escape Room Control Panel</h1>
+        <p class="opacity-70 text-sm">Auto-refreshing every second</p>
+    </header>
+
+    <!-- Status Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+        <!-- Round Card -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">Round</h2>
+                <p id="round" class="text-6xl font-bold mt-4">…</p>
+            </div>
+        </div>
+
+        <!-- Future status cards -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">Puzzle Status</h2>
+                <p class="text-xl opacity-50">Coming soon…</p>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">Timer</h2>
+                <p class="text-xl opacity-50">Coming soon…</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Game Control Grid -->
+    <section class="mb-6">
+        <h2 class="text-2xl font-bold mb-3">Game Controls</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            <button onclick="inc()"
+                class="btn btn-success btn-lg w-full">
+                ▲ Increase
+            </button>
+
+            <button onclick="dec()"
+                class="btn btn-secondary btn-lg w-full">
+                ▼ Decrease
+            </button>
+
+            <button onclick="resetState()"
+                class="btn btn-info btn-lg w-full">
+                Reset
+            </button>
+
+            <!-- Future puzzle buttons will go here -->
+
+        </div>
+    </section>
+
+    <!-- System Controls -->
+    <section class="mb-6">
+        <h2 class="text-2xl font-bold mb-3">System Controls</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <button onclick="reboot()"
+                class="btn btn-warning btn-lg w-full">
+                Reboot System
+            </button>
+
+            <button onclick="shutdown()"
+                class="btn btn-error btn-lg w-full">
+                Shutdown System
+            </button>
+
+            <!-- Future system buttons -->
+
+        </div>
+    </section>
+
+    <!-- Future expandable sections -->
+    <section class="mt-10">
+        <h2 class="text-2xl font-bold mb-4">Advanced Controls</h2>
+
+        <div class="collapse collapse-arrow bg-base-200 mb-2">
+            <input type="checkbox" />
+            <div class="collapse-title text-xl font-medium">
+                Puzzle 1 Settings
+            </div>
+            <div class="collapse-content">
+                <p class="opacity-70">More controls will be here…</p>
+            </div>
+        </div>
+
+        <div class="collapse collapse-arrow bg-base-200 mb-2">
+            <input type="checkbox" />
+            <div class="collapse-title text-xl font-medium">
+                Lighting System
+            </div>
+            <div class="collapse-content">
+                <p class="opacity-70">Coming soon…</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- JS -->
+    <script src="/static/js/app.js"></script>
+
+</body>
+</html>

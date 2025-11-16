@@ -29,12 +29,16 @@ def auth(credentials: HTTPBasicCredentials = Depends(security)):
         )
     return True
 
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 # Raspberry Pi reverse tunnel base
-BASE_URL = os.getenv("PI_BASE_URL", "http://<VPS-IP>:8200")
+BASE_URL = os.getenv("PI_BASE_URL", "http://83.228.207.123:8200")
 
 @app.get("/", response_class=HTMLResponse)
-def dashboard(auth=Depends(auth)):
-    return FileResponse("dashboard.html")
+def index(auth=Depends(auth)):
+    return FileResponse("index.html")
 
 @app.get("/api/state")
 def state(auth=Depends(auth)):
@@ -47,3 +51,17 @@ def inc(auth=Depends(auth)):
 @app.post("/api/dec")
 def dec(auth=Depends(auth)):
     return requests.post(f"{BASE_URL}/dec").json()
+
+@app.post("/api/shutdown")
+def shutdown(auth=Depends(auth)):
+    return requests.post(f"{BASE_URL}/shutdown").json()
+
+
+@app.post("/api/reboot")
+def reboot(auth=Depends(auth)):
+    return requests.post(f"{BASE_URL}/reboot").json()
+
+
+@app.post("/api/reset")
+def reset(auth=Depends(auth)):
+    return requests.post(f"{BASE_URL}/reset").json()

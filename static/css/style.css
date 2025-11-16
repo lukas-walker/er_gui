@@ -1,0 +1,8 @@
+/* Custom overrides (optional) */
+
+html, body {
+    scroll-behavior: smooth;
+}
+
+/* Example: card spacing tweaks */
+/* .card { } */
