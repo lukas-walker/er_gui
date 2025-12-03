@@ -50,7 +50,7 @@ btn.addEventListener('click', () => {
     // start polling snapshots
     videoTimer = setInterval(() => {
       img.src = '/api/snapshot?ts=' + Date.now();
-    }, 50);
+    }, 5000);
   } else {
     container.style.display = 'none';
     img.src = '';
