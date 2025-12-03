@@ -49,8 +49,8 @@ btn.addEventListener('click', () => {
 
     // start polling snapshots
     videoTimer = setInterval(() => {
-      img.src = '/api/snapshot?ts=' + Date.now(); // cache-buster
-    }, 300); // every 300 ms (~3 FPS) – adjust as you like
+      img.src = '/api/snapshot?ts=' + Date.now();
+    }, 1000);
   } else {
     container.style.display = 'none';
     img.src = '';

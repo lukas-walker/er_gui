@@ -73,10 +73,12 @@ def api_snapshot(auth=Depends(auth)):
     """
     target_url = f"{BASE_URL}/client/video/frame"
 
-    # simple pass-through; one request = one image
-    r = requests.get(target_url, stream=True, timeout=5)
+    try:
+        r = requests.get(target_url, timeout=5)
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"Error talking to Pi: {e}")
 
-    return StreamingResponse(
-        r.iter_content(chunk_size=1024),
-        media_type="image/jpeg"
-    )
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}")
+
+    return Response(content=r.content, media_type="image/jpeg")
