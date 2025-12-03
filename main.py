@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
-import httpx
 import secrets
 import requests
 import os
@@ -68,16 +67,16 @@ def reset(auth=Depends(auth)):
     return requests.post(f"{BASE_URL}/reset").json()
 
 @app.get("/api/video")
-async def api_video():
+def api_video(auth=Depends(auth)):
     """
-    Proxy MJPEG from server Pi to browser.
+    Proxy MJPEG from server Pi to browser using requests.
     """
     target_url = f"{BASE_URL}/client/video/mjpeg"
 
-    async def stream():
-        async with httpx.AsyncClient() as client:
-            async with client.stream("GET", target_url) as r:
-                async for chunk in r.aiter_bytes():
+    def stream():
+        with requests.get(target_url, stream=True) as r:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
                     yield chunk
 
     return StreamingResponse(
