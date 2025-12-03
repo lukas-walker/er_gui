@@ -66,20 +66,17 @@ def reboot(auth=Depends(auth)):
 def reset(auth=Depends(auth)):
     return requests.post(f"{BASE_URL}/reset").json()
 
-@app.get("/api/video")
-def api_video(auth=Depends(auth)):
+@app.get("/api/snapshot")
+def api_snapshot(auth=Depends(auth)):
     """
-    Proxy MJPEG from server Pi to browser using requests.
+    Proxy a single JPEG frame from the server Pi to the browser.
     """
-    target_url = f"{BASE_URL}/client/video/mjpeg"
+    target_url = f"{BASE_URL}/client/video/frame"
 
-    def stream():
-        with requests.get(target_url, stream=True) as r:
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk:
-                    yield chunk
+    # simple pass-through; one request = one image
+    r = requests.get(target_url, stream=True, timeout=5)
 
     return StreamingResponse(
-        stream(),
-        media_type="multipart/x-mixed-replace; boundary=frame"
+        r.iter_content(chunk_size=1024),
+        media_type="image/jpeg"
     )

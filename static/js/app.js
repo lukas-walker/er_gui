@@ -41,13 +41,22 @@ const btn = document.getElementById('toggle-video');
 const container = document.getElementById('video-container');
 const img = document.getElementById('video-stream');
 
+let videoTimer = null;
+
 btn.addEventListener('click', () => {
-if (container.style.display === 'none') {
-  container.style.display = 'block';
-  // cache-buster so each click opens a fresh stream
-  img.src = '/api/video?ts=' + Date.now();
-} else {
-  container.style.display = 'none';
-  img.src = ''; // closing the stream
-}
+  if (container.style.display === 'none') {
+    container.style.display = 'block';
+
+    // start polling snapshots
+    videoTimer = setInterval(() => {
+      img.src = '/api/snapshot?ts=' + Date.now(); // cache-buster
+    }, 300); // every 300 ms (~3 FPS) – adjust as you like
+  } else {
+    container.style.display = 'none';
+    img.src = '';
+    if (videoTimer) {
+      clearInterval(videoTimer);
+      videoTimer = null;
+    }
+  }
 });
