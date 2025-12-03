@@ -34,3 +34,20 @@ async function doShutdown() {
 // Auto-refresh loop
 refresh();
 setInterval(refresh, 1000);
+
+
+// Handle video feed
+const btn = document.getElementById('toggle-video');
+const container = document.getElementById('video-container');
+const img = document.getElementById('video-stream');
+
+btn.addEventListener('click', () => {
+if (container.style.display === 'none') {
+  container.style.display = 'block';
+  // cache-buster so each click opens a fresh stream
+  img.src = '/api/video?ts=' + Date.now();
+} else {
+  container.style.display = 'none';
+  img.src = ''; // closing the stream
+}
+});
