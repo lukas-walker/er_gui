@@ -7,6 +7,7 @@ import secrets
 import requests
 import os
 
+# app
 app = FastAPI()
 security = HTTPBasic()
 
