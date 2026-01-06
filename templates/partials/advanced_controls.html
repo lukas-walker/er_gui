@@ -57,5 +57,22 @@
           class="textarea textarea-bordered font-mono w-full mt-3"
           rows="16"
           placeholder='Click "Load snapshot → editor", then edit here...'
+        ></textarea>
 
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <button class="btn btn-outline w-full" onclick="formatEditorJson()">
+            Format JSON
+          </button>
+          <label for="modal-set-state" class="btn btn-primary w-full">
+            Apply from editor
+          </label>
+        </div>
+
+        <p id="state-error" class="text-sm text-error mt-2 hidden"></p>
+        <p id="state-success" class="text-sm text-success mt-2 hidden"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
 </section>
