@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 import secrets
 import requests
 import os
+from pydantic import BaseModel
 
 # app
 app = FastAPI()
@@ -71,3 +72,20 @@ def api_snapshot(_auth=Depends(auth)):
         raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}")
 
     return Response(content=r.content, media_type="image/jpeg")
+
+
+
+class SetStatePayload(BaseModel):
+    state: dict
+
+@app.post("/api/state")
+def set_state(payload: SetStatePayload, _auth=Depends(auth)):
+    """
+    Proxy state overwrite to the Pi.
+    Pi endpoint (to be implemented later): POST /state
+    Body: { "state": { ... } }
+    """
+    r = requests.post(f"{BASE_URL}/state", json=payload.model_dump(), timeout=10)
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
+    return r.json()

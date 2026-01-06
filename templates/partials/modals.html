@@ -33,3 +33,20 @@
     </div>
   </div>
 </div>
+
+<!-- SET STATE MODAL -->
+<input type="checkbox" id="modal-set-state" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Apply new state?</h3>
+    <p class="opacity-70 mt-2">
+      This will overwrite the current state on the Pi server.
+    </p>
+    <div class="modal-action">
+      <label for="modal-set-state" class="btn btn-ghost">Cancel</label>
+      <label for="modal-set-state" class="btn btn-primary" onclick="applyStateFromEditor()">
+        Confirm
+      </label>
+    </div>
+  </div>
+</div>

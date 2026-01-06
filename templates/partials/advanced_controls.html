@@ -18,12 +18,44 @@
   </div>
 
   <div class="mt-6">
-    <h2 class="text-2xl font-bold mb-4">ADVANCED</h2>
+  <h2 class="text-2xl font-bold mb-4">State</h2>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+    <!-- Live viewer -->
     <div class="card bg-base-100 shadow-xl">
-      <div class="card-body items-center text-center">
-        <h2 class="card-title">Round</h2>
-        <p id="state" class="text-6xl font-bold mt-4">…</p>
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h3 class="card-title">Live State (read-only)</h3>
+          <button id="toggle-live" class="btn btn-sm btn-outline" onclick="toggleLive()">
+            Pause
+          </button>
+        </div>
+
+        <pre id="state-live"
+             class="mt-3 p-3 rounded bg-base-200 text-sm font-mono overflow-auto"
+             style="max-height: 420px;">…</pre>
+
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <button class="btn btn-outline w-full" onclick="copyLiveToEditor()">
+            Load snapshot → editor
+          </button>
+          <button class="btn btn-ghost w-full" onclick="copyLiveToClipboard()">
+            Copy live JSON
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- Editor -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title">Editor (frozen)</h3>
+
+        <textarea
+          id="state-editor"
+          class="textarea textarea-bordered font-mono w-full mt-3"
+          rows="16"
+          placeholder='Click "Load snapshot → editor", then edit here...'
+
 </section>
