@@ -141,7 +141,7 @@ async function applyStateFromEditor() {
     const res = await fetch("/api/state", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ state: parsed }),
+      body: JSON.stringify(parsed)
     });
 
     if (!res.ok) {

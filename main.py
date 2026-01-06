@@ -3,6 +3,8 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi import Body
+from typing import Any, Dict
 import secrets
 import requests
 import os
@@ -75,17 +77,9 @@ def api_snapshot(_auth=Depends(auth)):
 
 
 
-class SetStatePayload(BaseModel):
-    state: dict
-
 @app.post("/api/state")
-def set_state(payload: SetStatePayload, _auth=Depends(auth)):
-    """
-    Proxy state overwrite to the Pi.
-    Pi endpoint (to be implemented later): POST /state
-    Body: { "state": { ... } }
-    """
-    r = requests.post(f"{BASE_URL}/state", json=payload.model_dump(), timeout=10)
+def set_state(payload: Dict[str, Any] = Body(...), _auth=Depends(auth)):
+    r = requests.post(f"{BASE_URL}/state", json=payload, timeout=10)
     if r.status_code != 200:
         raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
     return r.json()
