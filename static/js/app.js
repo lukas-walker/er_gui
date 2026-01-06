@@ -2,6 +2,7 @@ async function refresh() {
     const res = await fetch("/api/state");
     const data = await res.json();
     document.getElementById("round").innerText = data.round;
+    document.getElementById("state").innerText = data;
 }
 
 // === Controls ===
