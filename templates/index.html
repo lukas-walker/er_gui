@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Escape Room Control Panel</title>
+
+  <!-- Tailwind + DaisyUI CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.0/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+
+<body class="min-h-screen bg-base-300 text-base-content p-4">
+
+  {% include "partials/nav.html" %}
+
+  <main class="mt-6">
+    {% include "partials/status.html" %}
+    {% include "partials/game_controls.html" %}
+    {% include "partials/system_controls.html" %}
+    {% include "partials/advanced_controls.html" %}
+    {% include "partials/live_video.html" %}
+  </main>
+
+  {% include "partials/modals.html" %}
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
