@@ -4,5 +4,9 @@ html, body {
     scroll-behavior: smooth;
 }
 
+#live-video {
+    display: none;
+}
+
 /* Example: card spacing tweaks */
 /* .card { } */
