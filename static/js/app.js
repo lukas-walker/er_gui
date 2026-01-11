@@ -30,7 +30,13 @@ async function refreshLogs() {
 
     const faceImages = (logs?.clickwork?.["face-images"] ?? []);
     if (Array.isArray(faceImages)) {
-      const sig = faceImages.length + ":" + (faceImages[faceImages.length - 1] || "").slice(0, 64);
+      const last = faceImages[faceImages.length - 1];
+        const lastB64 =
+          typeof last === "string" ? last :
+          (last && typeof last === "object" && typeof last.image_b64 === "string")
+            ? last.image_b64
+            : "";
+        const sig = faceImages.length + ":" + lastB64.slice(0, 64);
       if (sig !== lastFaceImagesSig) {
         renderImages(faceImages);
         lastFaceImagesSig = sig;
@@ -92,8 +98,14 @@ function renderImages(faceImages) {
   const items = [...faceImages].reverse();
 
   for (let i = 0; i < items.length; i++) {
-    const b64 = items[i];
-    if (typeof b64 !== "string" || b64.length < 32) continue;
+    const item = items[i];
+    const b64 =
+      typeof item === "string" ? item :
+      (item && typeof item === "object" && typeof item.image_b64 === "string")
+        ? item.image_b64
+        : null;
+
+    if (!b64 || b64.length < 32) continue;
 
     // Heuristic: if it already includes a data: prefix, keep it; else assume jpeg
     const src = b64.startsWith("data:")
@@ -111,7 +123,15 @@ function renderImages(faceImages) {
 
     const label = document.createElement("div");
     label.className = "text-sm opacity-70";
-    label.innerText = `Image ${items.length - i}`;
+
+    const ts =
+      item && typeof item === "object" && typeof item.timestamp === "string"
+        ? item.timestamp
+        : null;
+
+    label.innerText = ts
+      ? `Image ${items.length - i} — ${ts}`
+      : `Image ${items.length - i}`;
 
     const btn = document.createElement("button");
     btn.className = "btn btn-xs btn-outline";
