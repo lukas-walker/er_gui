@@ -169,7 +169,7 @@ async function doShutdown() {
     refresh();
 }
 
-// Auto-refresh loop
+// Auto-refresh loop including logs
 refresh();
 refreshLogs();
 setInterval(() => {
