@@ -1,0 +1,31 @@
+<section id="images" class="mt-10 scroll-mt-24">
+  <h2 class="text-2xl font-bold mb-4">Images</h2>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="card-title">
+          Clickwork Face Images (from logs)
+          <span class="badge badge-outline ml-2"><span id="images-count">0</span></span>
+        </h3>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-sm btn-outline" onclick="refreshLogs()">
+            Refresh now
+          </button>
+          <button class="btn btn-sm btn-ghost" onclick="clearImages()">
+            Clear view
+          </button>
+        </div>
+      </div>
+
+      <p class="opacity-70 mt-2 text-sm">
+        Renders <code>logs.clickwork["face-images"]</code> base64 entries.
+      </p>
+
+      <div id="images-grid" class="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+
+      <p id="images-empty" class="opacity-60 mt-4 hidden">No images found.</p>
+      <p id="images-error" class="text-sm text-error mt-2 hidden"></p>
+    </div>
+  </div>
+</section>

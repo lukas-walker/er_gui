@@ -76,10 +76,16 @@ def api_snapshot(_auth=Depends(auth)):
     return Response(content=r.content, media_type="image/jpeg")
 
 
-
 @app.post("/api/state")
 def set_state(payload: Dict[str, Any] = Body(...), _auth=Depends(auth)):
     r = requests.post(f"{BASE_URL}/state", json=payload, timeout=10)
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
+    return r.json()
+
+@app.get("/api/logs")
+def api_logs(_auth=Depends(auth)):
+    r = requests.get(f"{BASE_URL}/logs", timeout=10)
     if r.status_code != 200:
         raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
     return r.json()

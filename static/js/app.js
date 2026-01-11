@@ -1,4 +1,6 @@
 let liveEnabled = true;
+let lastLogsJson = null;
+let lastFaceImagesSig = "";
 
 async function refresh() {
   const res = await fetch("/api/state");
@@ -8,6 +10,147 @@ async function refresh() {
 
   const pretty = JSON.stringify(data, null, 2);
   document.getElementById("state-live").innerText = pretty;
+}
+
+async function refreshLogs() {
+  const res = await fetch("/api/logs");
+  if (!res.ok) {
+    // Avoid spamming; show minimal failure state
+    const el = document.getElementById("logs-json");
+    if (el) el.innerText = `Failed to load logs (${res.status})`;
+    return;
+  }
+
+  const logs = await res.json();
+  lastLogsJson = logs;
+
+  const countEl = document.getElementById("images-count");
+  const faceImages = (logs?.clickwork?.["face-images"] ?? []);
+  if (countEl && Array.isArray(faceImages)) {
+    countEl.innerText = `${faceImages.length}`;
+  }
+
+  // Render logs JSON
+  const logsPretty = JSON.stringify(logs, null, 2);
+  const pre = document.getElementById("logs-json");
+  if (pre) pre.innerText = logsPretty;
+
+  // Render images (only if count changed)
+  try {
+    const faceImages = (logs?.clickwork?.["face-images"] ?? []);
+    if (!Array.isArray(faceImages)) return;
+
+    const sig = faceImages.length + ":" + (faceImages[faceImages.length - 1] || "").slice(0, 64);
+    if (sig !== lastFaceImagesSig) {
+      renderImages(faceImages);
+      lastFaceImagesSig = sig;
+    }
+  } catch (e) {
+    const err = document.getElementById("images-error");
+    if (err) {
+      err.innerText = "Image render error: " + e.message;
+      err.classList.remove("hidden");
+    }
+  }
+}
+
+function clearImages() {
+  const grid = document.getElementById("images-grid");
+  const empty = document.getElementById("images-empty");
+  const err = document.getElementById("images-error");
+  if (grid) grid.innerHTML = "";
+  if (empty) empty.classList.add("hidden");
+  if (err) {
+    err.classList.add("hidden");
+    err.innerText = "";
+  }
+}
+
+function guessImageMime(b64) {
+  // Common base64 magic headers:
+  // JPEG: /9j/
+  // PNG:  iVBORw0KGgo
+  // WEBP: UklGR
+  if (b64.startsWith("/9j/")) return "image/jpeg";
+  if (b64.startsWith("iVBORw0KGgo")) return "image/png";
+  if (b64.startsWith("UklGR")) return "image/webp";
+  return "image/jpeg";
+}
+
+function renderImages(faceImages) {
+  const grid = document.getElementById("images-grid");
+  const empty = document.getElementById("images-empty");
+  const err = document.getElementById("images-error");
+
+  if (!grid) return;
+
+  // Reset UI
+  if (err) {
+    err.classList.add("hidden");
+    err.innerText = "";
+  }
+
+  grid.innerHTML = "";
+
+  if (!faceImages.length) {
+    if (empty) empty.classList.remove("hidden");
+    return;
+  } else {
+    if (empty) empty.classList.add("hidden");
+  }
+
+  // Render newest first
+  const items = [...faceImages].reverse();
+
+  for (let i = 0; i < items.length; i++) {
+    const b64 = items[i];
+    if (typeof b64 !== "string" || b64.length < 32) continue;
+
+    // Heuristic: if it already includes a data: prefix, keep it; else assume jpeg
+    const src = b64.startsWith("data:")
+      ? b64
+      : `data:${guessImageMime(b64)};base64,${b64}`;
+
+    const card = document.createElement("div");
+    card.className = "card bg-base-200";
+
+    const body = document.createElement("div");
+    body.className = "card-body p-4";
+
+    const title = document.createElement("div");
+    title.className = "flex items-center justify-between gap-2";
+
+    const label = document.createElement("div");
+    label.className = "text-sm opacity-70";
+    label.innerText = `Image ${items.length - i}`;
+
+    const btn = document.createElement("button");
+    btn.className = "btn btn-xs btn-outline";
+    btn.innerText = "Copy b64";
+    btn.onclick = async () => {
+      await navigator.clipboard.writeText(b64);
+    };
+
+    title.appendChild(label);
+    title.appendChild(btn);
+
+    const img = document.createElement("img");
+    img.src = src;
+    img.style.maxWidth = "100%";
+    img.style.borderRadius = "0.75rem";
+    img.style.border = "1px solid #444";
+    img.loading = "lazy";
+
+    body.appendChild(title);
+    body.appendChild(img);
+    card.appendChild(body);
+    grid.appendChild(card);
+  }
+}
+
+async function copyLogsToClipboard() {
+  if (!lastLogsJson) return;
+  await navigator.clipboard.writeText(JSON.stringify(lastLogsJson, null, 2));
 }
 
 // === Controls ===
@@ -39,10 +182,11 @@ async function doShutdown() {
 
 // Auto-refresh loop
 refresh();
+refreshLogs();
 setInterval(() => {
   if (liveEnabled) refresh();
+  refreshLogs();
 }, 1000);
-
 
 // Handle video feed
 const btn = document.getElementById('toggle-video');
