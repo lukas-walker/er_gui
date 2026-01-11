@@ -13,44 +13,33 @@ async function refresh() {
 }
 
 async function refreshLogs() {
-  const res = await fetch("/api/logs");
-  if (!res.ok) {
-    // Avoid spamming; show minimal failure state
-    const el = document.getElementById("logs-json");
-    if (el) el.innerText = `Failed to load logs (${res.status})`;
-    return;
-  }
-
-  const logs = await res.json();
-  lastLogsJson = logs;
-
-  const countEl = document.getElementById("images-count");
-  const faceImages = (logs?.clickwork?.["face-images"] ?? []);
-  if (countEl && Array.isArray(faceImages)) {
-    countEl.innerText = `${faceImages.length}`;
-  }
-
-  // Render logs JSON
-  const logsPretty = JSON.stringify(logs, null, 2);
   const pre = document.getElementById("logs-json");
-  if (pre) pre.innerText = logsPretty;
 
-  // Render images (only if count changed)
   try {
-    const faceImages = (logs?.clickwork?.["face-images"] ?? []);
-    if (!Array.isArray(faceImages)) return;
+    const res = await fetch("/api/logs");
+    if (!res.ok) {
+      const text = await res.text();
+      if (pre) pre.innerText = `Failed to load logs (${res.status}): ${text}`;
+      return;
+    }
 
-    const sig = faceImages.length + ":" + (faceImages[faceImages.length - 1] || "").slice(0, 64);
-    if (sig !== lastFaceImagesSig) {
-      renderImages(faceImages);
-      lastFaceImagesSig = sig;
+    const logs = await res.json();
+    lastLogsJson = logs;
+
+    if (pre) pre.innerText = JSON.stringify(logs, null, 2);
+
+    const faceImages = (logs?.clickwork?.["face-images"] ?? []);
+    if (Array.isArray(faceImages)) {
+      const sig = faceImages.length + ":" + (faceImages[faceImages.length - 1] || "").slice(0, 64);
+      if (sig !== lastFaceImagesSig) {
+        renderImages(faceImages);
+        lastFaceImagesSig = sig;
+      }
+      const countEl = document.getElementById("images-count");
+      if (countEl) countEl.innerText = `${faceImages.length}`;
     }
   } catch (e) {
-    const err = document.getElementById("images-error");
-    if (err) {
-      err.innerText = "Image render error: " + e.message;
-      err.classList.remove("hidden");
-    }
+    if (pre) pre.innerText = `Failed to load logs: ${e.message}`;
   }
 }
 
@@ -189,29 +178,31 @@ setInterval(() => {
 }, 1000);
 
 // Handle video feed
-const btn = document.getElementById('toggle-video');
-const container = document.getElementById('video-container');
-const img = document.getElementById('video-stream');
+// Handle video feed (optional section)
+const btn = document.getElementById("toggle-video");
+const container = document.getElementById("video-container");
+const img = document.getElementById("video-stream");
 
 let videoTimer = null;
 
-btn.addEventListener('click', () => {
-  if (container.style.display === 'none') {
-    container.style.display = 'block';
+if (btn && container && img) {
+  btn.addEventListener("click", () => {
+    if (container.style.display === "none") {
+      container.style.display = "block";
 
-    // start polling snapshots
-    videoTimer = setInterval(() => {
-      img.src = '/api/snapshot?ts=' + Date.now();
-    }, 5000);
-  } else {
-    container.style.display = 'none';
-    img.src = '';
-    if (videoTimer) {
-      clearInterval(videoTimer);
-      videoTimer = null;
+      videoTimer = setInterval(() => {
+        img.src = "/api/snapshot?ts=" + Date.now();
+      }, 5000);
+    } else {
+      container.style.display = "none";
+      img.src = "";
+      if (videoTimer) {
+        clearInterval(videoTimer);
+        videoTimer = null;
+      }
     }
-  }
-});
+  });
+}
 
 
 

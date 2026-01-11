@@ -6,3 +6,10 @@ html, body {
 
 /* Example: card spacing tweaks */
 /* .card { } */
+
+#state-editor {
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: auto;
+  word-wrap: normal;
+}
