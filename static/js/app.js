@@ -1,6 +1,8 @@
 let liveEnabled = true;
 let lastLogsJson = null;
 let lastFaceImagesSig = "";
+let lastLogsLastChanged = null; // last seen state.logs_last_changed
+let tickRunning = false;
 
 async function refresh() {
   const res = await fetch("/api/state");
@@ -10,8 +12,10 @@ async function refresh() {
 
   const pretty = JSON.stringify(data, null, 2);
   document.getElementById("state-live").innerText = pretty;
-}
 
+  // Return timestamp used to decide whether to refresh logs
+  return data.logs_last_changed ?? null;
+}
 async function refreshLogs() {
   const pre = document.getElementById("logs-json");
 
@@ -190,12 +194,28 @@ async function doShutdown() {
 }
 
 // Auto-refresh loop including logs
-refresh();
-refreshLogs();
-setInterval(() => {
-  if (liveEnabled) refresh();
-  refreshLogs();
-}, 1000);
+(async () => {
+  // initial load
+  lastLogsLastChanged = await refresh();
+  await refreshLogs();
+
+  setInterval(async () => {
+    if (!liveEnabled || tickRunning) return;
+    tickRunning = true;
+
+    try {
+      const newTs = await refresh();
+
+      // refresh logs only if timestamp changed
+      if (newTs !== lastLogsLastChanged) {
+        lastLogsLastChanged = newTs;
+        await refreshLogs();
+      }
+    } finally {
+      tickRunning = false;
+    }
+  }, 1000);
+})();
 
 // Handle video feed
 // Handle video feed (optional section)
