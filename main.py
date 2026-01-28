@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse, FileResponse, Response
+from fastapi.responses import HTMLResponse, FileResponse, Response, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Body
@@ -118,7 +118,6 @@ def set_state(payload: Dict[str, Any] = Body(...), _auth=Depends(auth)):
     return r.json()
 
 
-@app.get("/health")
+@app.get("/health", response_class=PlainTextResponse)
 def health():
-    # Coolify healthcheck target: must be fast, unauthenticated, and return 200.
-    return {"ok": True}
+    return "OK"
