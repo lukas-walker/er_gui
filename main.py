@@ -42,13 +42,47 @@ def index(request: Request, _auth=Depends(auth)):
 def state(_auth=Depends(auth)):
     return requests.get(f"{BASE_URL}/state").json()
 
-@app.post("/api/inc")
-def inc(_auth=Depends(auth)):
-    return requests.post(f"{BASE_URL}/inc").json()
+@app.get("/api/logs")
+def api_logs(_auth=Depends(auth)):
+    r = requests.get(f"{BASE_URL}/logs", timeout=10)
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
+    return r.json()
 
-@app.post("/api/dec")
-def dec(_auth=Depends(auth)):
-    return requests.post(f"{BASE_URL}/dec").json()
+@app.get("/api/extended_state")
+def api_extended_state(_auth=Depends(auth)):
+    r = requests.get(f"{BASE_URL}/extended_state", timeout=10)
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
+    return r.json()
+
+class ProxyRequest(BaseModel):
+    method: str  # "GET", "POST", ...
+    path: str    # e.g. "/roles/clickwork/reboot"
+    json: Dict[str, Any] | None = None
+
+@app.post("/api/proxy")
+def api_proxy(req: ProxyRequest, _auth=Depends(auth)):
+    method = req.method.upper().strip()
+    path = req.path.strip()
+
+    if not path.startswith("/"):
+        raise HTTPException(status_code=400, detail="path must start with '/'")
+
+    url = f"{BASE_URL}{path}"
+
+    try:
+        r = requests.request(method, url, json=req.json, timeout=15)
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"Error talking to Pi: {e}")
+
+    # Return JSON if possible, else raw text, plus status
+    try:
+        body = r.json()
+    except Exception:
+        body = r.text
+
+    return {"ok": r.ok, "status": r.status_code, "body": body}
 
 @app.post("/api/shutdown")
 def shutdown(_auth=Depends(auth)):
@@ -79,13 +113,6 @@ def api_snapshot(_auth=Depends(auth)):
 @app.post("/api/state")
 def set_state(payload: Dict[str, Any] = Body(...), _auth=Depends(auth)):
     r = requests.post(f"{BASE_URL}/state", json=payload, timeout=10)
-    if r.status_code != 200:
-        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
-    return r.json()
-
-@app.get("/api/logs")
-def api_logs(_auth=Depends(auth)):
-    r = requests.get(f"{BASE_URL}/logs", timeout=10)
     if r.status_code != 200:
         raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
     return r.json()

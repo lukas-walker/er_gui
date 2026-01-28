@@ -2,20 +2,25 @@ let liveEnabled = true;
 let lastLogsJson = null;
 let lastFaceImagesSig = "";
 let lastLogsLastChanged = null; // last seen state.logs_last_changed
+let lastExtendedLastChanged = null; // last seen state.extended_state_last_changed
+let lastExtendedJson = null;
 let tickRunning = false;
 
 async function refresh() {
   const res = await fetch("/api/state");
   const data = await res.json();
 
-  document.getElementById("round").innerText = data.round ?? "—";
-
   const pretty = JSON.stringify(data, null, 2);
-  document.getElementById("state-live").innerText = pretty;
+  const statePre = document.getElementById("state-live");
+  if (statePre) statePre.innerText = pretty;
 
-  // Return timestamp used to decide whether to refresh logs
-  return data.logs_last_changed ?? null;
+  // Return timestamps used to decide whether to refresh logs / extended state
+  return {
+    logs_last_changed: data.logs_last_changed ?? null,
+    extended_state_last_changed: data.extended_state_last_changed ?? null,
+  };
 }
+
 async function refreshLogs() {
   const pre = document.getElementById("logs-json");
 
@@ -51,6 +56,31 @@ async function refreshLogs() {
   } catch (e) {
     if (pre) pre.innerText = `Failed to load logs: ${e.message}`;
   }
+}
+
+async function refreshExtendedState() {
+  const pre = document.getElementById("extended-state-json");
+  if (!pre) return;
+
+  try {
+    const res = await fetch("/api/extended_state");
+    if (!res.ok) {
+      const text = await res.text();
+      pre.innerText = `Failed to load extended_state (${res.status}): ${text}`;
+      return;
+    }
+
+    const ext = await res.json();
+    lastExtendedJson = ext;
+    pre.innerText = JSON.stringify(ext, null, 2);
+  } catch (e) {
+    pre.innerText = `Failed to load extended_state: ${e.message}`;
+  }
+}
+
+async function copyExtendedStateToClipboard() {
+  if (!lastExtendedJson) return;
+  await navigator.clipboard.writeText(JSON.stringify(lastExtendedJson, null, 2));
 }
 
 function clearImages() {
@@ -193,23 +223,31 @@ async function doShutdown() {
     refresh();
 }
 
-// Auto-refresh loop including logs
+// Auto-refresh loop including logs and extended state
 (async () => {
   // initial load
-  lastLogsLastChanged = await refresh();
+  const ts0 = await refresh();
+  lastLogsLastChanged = ts0.logs_last_changed;
+  lastExtendedLastChanged = ts0.extended_state_last_changed;
+
   await refreshLogs();
+  await refreshExtendedState();
 
   setInterval(async () => {
     if (!liveEnabled || tickRunning) return;
     tickRunning = true;
 
     try {
-      const newTs = await refresh();
+      const ts = await refresh();
 
-      // refresh logs only if timestamp changed
-      if (newTs !== lastLogsLastChanged) {
-        lastLogsLastChanged = newTs;
+      if (ts.logs_last_changed !== lastLogsLastChanged) {
+        lastLogsLastChanged = ts.logs_last_changed;
         await refreshLogs();
+      }
+
+      if (ts.extended_state_last_changed !== lastExtendedLastChanged) {
+        lastExtendedLastChanged = ts.extended_state_last_changed;
+        await refreshExtendedState();
       }
     } finally {
       tickRunning = false;
