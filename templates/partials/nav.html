@@ -1,17 +1,47 @@
 <header class="mb-6">
   <div class="navbar bg-base-100 rounded-box shadow-xl">
+
+    <!-- Left: title -->
     <div class="flex-1 px-2">
       <span class="text-xl font-bold">Escape Room Control Panel</span>
-      <span class="ml-3 opacity-70 text-sm">Auto-refreshing every second</span>
+      <span class="ml-3 opacity-70 text-sm hidden sm:inline">
+        Auto-refreshing every second
+      </span>
     </div>
-    <div class="flex-none">
+
+    <!-- Mobile dropdown -->
+    <div class="flex-none sm:hidden">
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-square">
+          <!-- hamburger icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </label>
+        <ul tabindex="0"
+            class="menu dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+          <li><a href="#system-controls">System</a></li>
+          <li><a href="#advanced-controls">Advanced</a></li>
+          <li><a href="#logs">Logs</a></li>
+          <li><a href="#extended-state">Extended</a></li>
+          <li><a href="#images">Images</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Desktop menu -->
+    <div class="flex-none hidden sm:block">
       <ul class="menu menu-horizontal px-1">
         <li><a href="#system-controls">System</a></li>
-        <li><a href="#advanced-controls">System</a></li>
+        <li><a href="#advanced-controls">Advanced</a></li>
         <li><a href="#logs">Logs</a></li>
         <li><a href="#extended-state">Extended</a></li>
         <li><a href="#images">Images</a></li>
       </ul>
     </div>
+
   </div>
 </header>
