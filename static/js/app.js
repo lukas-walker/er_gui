@@ -5,21 +5,34 @@ let lastLogsLastChanged = null; // last seen state.logs_last_changed
 let lastExtendedLastChanged = null; // last seen state.extended_state_last_changed
 let lastExtendedJson = null;
 let tickRunning = false;
+let lastStateJson = null;
+let lastRolesSig = "";
 
 async function refresh() {
   const res = await fetch("/api/state");
   const data = await res.json();
 
+  lastStateJson = data;
+
   const pretty = JSON.stringify(data, null, 2);
   const statePre = document.getElementById("state-live");
   if (statePre) statePre.innerText = pretty;
 
-  // Return timestamps used to decide whether to refresh logs / extended state
+  // Rebuild action buttons if roles changed
+  const roles = data.roles || {};
+  const roleIds = Object.keys(roles).sort();
+  const sig = roleIds.join("|");
+  if (sig !== lastRolesSig) {
+    lastRolesSig = sig;
+    renderActionControls(roleIds);
+  }
+
   return {
     logs_last_changed: data.logs_last_changed ?? null,
     extended_state_last_changed: data.extended_state_last_changed ?? null,
   };
 }
+
 
 async function refreshLogs() {
   const pre = document.getElementById("logs-json");
@@ -196,30 +209,109 @@ async function copyLogsToClipboard() {
   await navigator.clipboard.writeText(JSON.stringify(lastLogsJson, null, 2));
 }
 
+async function proxyCall(method, path, jsonBody = null) {
+  const res = await fetch("/api/proxy", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ method, path, json: jsonBody }),
+  });
+  return await res.json(); // {ok,status,body}
+}
+
+async function callAction(path) {
+  // Simple fire-and-refresh for action endpoints that take no body
+  const resp = await proxyCall("POST", path, null);
+  if (!resp.ok) {
+    alert(`Call failed (${resp.status}): ${typeof resp.body === "string" ? resp.body : JSON.stringify(resp.body)}`);
+  }
+  // refresh immediately after
+  await refresh();
+}
+
+// Exposed for the "Rebuild buttons" button
+function renderActionControlsFromLiveState() {
+  const roles = (lastStateJson && lastStateJson.roles) ? lastStateJson.roles : {};
+  const roleIds = Object.keys(roles).sort();
+  renderActionControls(roleIds);
+}
+
+function renderActionControls(roleIds) {
+  const host = document.getElementById("action-controls");
+  const err = document.getElementById("action-controls-error");
+  if (!host) return;
+
+  if (err) {
+    err.classList.add("hidden");
+    err.innerText = "";
+  }
+
+  host.innerHTML = "";
+
+  // --- Broadcast card ---
+  host.appendChild(makeActionCard("Broadcast", [
+    { label: "Shutdown all", cls: "btn-error", path: "/shutdown" },
+    { label: "Reboot all", cls: "btn-warning", path: "/reboot" },
+    { label: "Update all", cls: "btn-primary", path: "/update" },
+  ]));
+
+  // --- Server card ---
+  host.appendChild(makeActionCard("Server", [
+    { label: "Shutdown server", cls: "btn-error", path: "/server/shutdown" },
+    { label: "Reboot server", cls: "btn-warning", path: "/server/reboot" },
+    { label: "Update server", cls: "btn-primary", path: "/server/update" },
+  ]));
+
+  // --- Roles cards ---
+  if (!roleIds.length) {
+    if (err) {
+      err.innerText = "No roles found in state.roles (cannot build per-role controls).";
+      err.classList.remove("hidden");
+    }
+    return;
+  }
+
+  for (const roleId of roleIds) {
+    const safeTitle = `Role: ${roleId}`;
+    host.appendChild(makeActionCard(safeTitle, [
+      { label: "Shutdown", cls: "btn-error", path: `/roles/${encodeURIComponent(roleId)}/shutdown` },
+      { label: "Reboot", cls: "btn-warning", path: `/roles/${encodeURIComponent(roleId)}/reboot` },
+      { label: "Update", cls: "btn-primary", path: `/roles/${encodeURIComponent(roleId)}/update` },
+    ]));
+  }
+}
+
+function makeActionCard(title, buttons) {
+  const card = document.createElement("div");
+  card.className = "card bg-base-200";
+
+  const body = document.createElement("div");
+  body.className = "card-body p-4";
+
+  const h = document.createElement("h4");
+  h.className = "font-bold";
+  h.innerText = title;
+
+  const row = document.createElement("div");
+  row.className = "mt-3 flex flex-wrap gap-2";
+
+  for (const b of buttons) {
+    const btn = document.createElement("button");
+    btn.className = `btn btn-sm ${b.cls}`;
+    btn.innerText = b.label;
+    btn.onclick = () => callAction(b.path);
+    row.appendChild(btn);
+  }
+
+  body.appendChild(h);
+  body.appendChild(row);
+  card.appendChild(body);
+  return card;
+}
+
 // === Controls ===
-
-async function inc() {
-    await fetch("/api/inc", { method: "POST" });
-    refresh();
-}
-
-async function dec() {
-    await fetch("/api/dec", { method: "POST" });
-    refresh();
-}
 
 async function doReset() {
     await fetch("/api/reset", { method: "POST" });
-    refresh();
-}
-
-async function doReboot() {
-    await fetch("/api/reboot", { method: "POST" });
-    refresh();
-}
-
-async function doShutdown() {
-    await fetch("/api/shutdown", { method: "POST" });
     refresh();
 }
 

@@ -5,4 +5,24 @@
     <label for="modal-reboot" class="btn btn-warning btn-lg w-full">Reboot</label>
     <label for="modal-shutdown" class="btn btn-error btn-lg w-full">Shutdown</label>
   </div>
+
+    <div class="mt-6 card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="card-title">Actions</h3>
+        <button class="btn btn-sm btn-outline" onclick="renderActionControlsFromLiveState()">
+          Rebuild buttons
+        </button>
+      </div>
+
+      <p class="opacity-70 text-sm mt-1">
+        Broadcast + server + per-role controls are generated from <code>state.roles</code>.
+      </p>
+
+      <div id="action-controls" class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4"></div>
+
+      <p id="action-controls-error" class="text-sm text-error mt-3 hidden"></p>
+    </div>
+  </div>
 </section>
+
