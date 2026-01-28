@@ -50,3 +50,16 @@
     </div>
   </div>
 </div>
+
+<!-- GENERIC ACTION MODAL -->
+<input type="checkbox" id="modal-action" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Confirm action</h3>
+    <p id="modal-action-text" class="opacity-70 mt-2">Are you sure?</p>
+    <div class="modal-action">
+      <label for="modal-action" class="btn btn-ghost">Cancel</label>
+      <label for="modal-action" class="btn btn-warning" onclick="confirmPendingAction()">Confirm</label>
+    </div>
+  </div>
+</div>

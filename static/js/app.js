@@ -7,6 +7,7 @@ let lastExtendedJson = null;
 let tickRunning = false;
 let lastStateJson = null;
 let lastRolesSig = "";
+let pendingAction = null; // { path, label, danger }
 
 async function refresh() {
   const res = await fetch("/api/state");
@@ -228,6 +229,42 @@ async function callAction(path) {
   await refresh();
 }
 
+function openActionModal(label, path, danger = false) {
+  pendingAction = { label, path, danger };
+
+  const text = document.getElementById("modal-action-text");
+  if (text) text.innerText = `Really execute: ${label} ?\n${path}`;
+
+  // tweak confirm button style
+  const confirmBtn = document.querySelector('label[onclick="confirmPendingAction()"]');
+  if (confirmBtn) {
+    confirmBtn.classList.remove("btn-error", "btn-warning", "btn-primary");
+    confirmBtn.classList.add(danger ? "btn-error" : "btn-warning");
+  }
+
+  // open modal (toggle checkbox)
+  const cb = document.getElementById("modal-action");
+  if (cb) cb.checked = true;
+}
+
+async function confirmPendingAction() {
+  if (!pendingAction) return;
+
+  const { path } = pendingAction;
+  pendingAction = null;
+
+  const resp = await proxyCall("POST", path, null);
+  if (!resp.ok) {
+    alert(`Call failed (${resp.status}): ${typeof resp.body === "string" ? resp.body : JSON.stringify(resp.body)}`);
+  }
+
+  // close modal
+  const cb = document.getElementById("modal-action");
+  if (cb) cb.checked = false;
+
+  await refresh();
+}
+
 // Exposed for the "Rebuild buttons" button
 function renderActionControlsFromLiveState() {
   const roles = (lastStateJson && lastStateJson.roles) ? lastStateJson.roles : {};
@@ -298,7 +335,7 @@ function makeActionCard(title, buttons) {
     const btn = document.createElement("button");
     btn.className = `btn btn-sm ${b.cls}`;
     btn.innerText = b.label;
-    btn.onclick = () => callAction(b.path);
+    btn.onclick = () => openActionModal(b.label, b.path, b.cls === "btn-error");
     row.appendChild(btn);
   }
 
