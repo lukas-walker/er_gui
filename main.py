@@ -116,3 +116,9 @@ def set_state(payload: Dict[str, Any] = Body(...), _auth=Depends(auth)):
     if r.status_code != 200:
         raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
     return r.json()
+
+
+@app.get("/health")
+def health():
+    # Coolify healthcheck target: must be fast, unauthenticated, and return 200.
+    return {"ok": True}
