@@ -92,6 +92,10 @@ def shutdown(_auth=Depends(auth)):
 def reboot(_auth=Depends(auth)):
     return requests.post(f"{BASE_URL}/reboot").json()
 
+@app.post("/api/restart")
+def reset(_auth=Depends(auth)):
+    return requests.post(f"{BASE_URL}/restart").json()
+
 @app.post("/api/reset")
 def reset(_auth=Depends(auth)):
     return requests.post(f"{BASE_URL}/reset").json()

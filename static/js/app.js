@@ -336,6 +336,7 @@ function renderActionControls(roleIds) {
     { label: "Shutdown all", cls: "btn-error", path: "/shutdown" },
     { label: "Reboot all", cls: "btn-warning", path: "/reboot" },
     { label: "Update all", cls: "btn-primary", path: "/update" },
+    { label: "Restart all", cls: "btn-primary", path: "/restart" },
   ]));
 
   // --- Server card ---
@@ -343,6 +344,7 @@ function renderActionControls(roleIds) {
     { label: "Shutdown server", cls: "btn-error", path: "/server/shutdown" },
     { label: "Reboot server", cls: "btn-warning", path: "/server/reboot" },
     { label: "Update server", cls: "btn-primary", path: "/server/update" },
+    { label: "Restart server", cls: "btn-primary", path: "/server/restart" },
   ]));
 
   // --- Roles cards ---
@@ -362,6 +364,7 @@ function renderActionControls(roleIds) {
     { label: "Shutdown", cls: "btn-error", path: `/roles/${encodeURIComponent(roleId)}/shutdown` },
     { label: "Reboot", cls: "btn-warning", path: `/roles/${encodeURIComponent(roleId)}/reboot` },
     { label: "Update", cls: "btn-primary", path: `/roles/${encodeURIComponent(roleId)}/update` },
+    { label: "Restart", cls: "btn-primary", path: `/roles/${encodeURIComponent(roleId)}/restart` },
   ]));
 }
 }
