@@ -8,13 +8,18 @@ let tickRunning = false;
 let lastStateJson = null;
 let lastRolesSig = "";
 let pendingAction = null; // { path, label, danger }
+let lastLivelinessUpdate = 0;
 
 async function refresh() {
   const res = await fetch("/api/state");
   const data = await res.json();
 
   lastStateJson = data;
-  renderActionControlsFromLiveState();
+  const now = Date.now();
+    if (now - lastLivelinessUpdate > 10_000) {
+      lastLivelinessUpdate = now;
+      updateRoleLiveliness();
+    }
 
   const pretty = JSON.stringify(data, null, 2);
   const statePre = document.getElementById("state-live");
@@ -287,6 +292,26 @@ function formatLastSeen(roleId) {
   return { online, text: `last seen ${ageS}s ago` };
 }
 
+function updateRoleLiveliness() {
+  if (!lastStateJson || !lastStateJson.roles) return;
+
+  for (const roleId of Object.keys(lastStateJson.roles)) {
+    const ls = formatLastSeen(roleId);
+
+    const dot = document.querySelector(`[data-role-dot="${roleId}"]`);
+    const text = document.querySelector(`[data-role-lastseen="${roleId}"]`);
+
+    if (dot) {
+      dot.classList.toggle("bg-success", ls.online);
+      dot.classList.toggle("bg-error", !ls.online);
+    }
+
+    if (text) {
+      text.innerText = ls.text;
+    }
+  }
+}
+
 // Exposed for the "Rebuild buttons" button
 function renderActionControlsFromLiveState() {
   const roles = (lastStateJson && lastStateJson.roles) ? lastStateJson.roles : {};
@@ -383,6 +408,7 @@ function makeRoleActionCard(roleId, lastSeen, buttons) {
   left.className = "flex items-center gap-2";
 
   const dot = document.createElement("span");
+  dot.dataset.roleDot = roleId;
   dot.className = "inline-block w-3 h-3 rounded-full";
   // DaisyUI/Tailwind: bg-success / bg-error
   dot.classList.add(lastSeen.online ? "bg-success" : "bg-error");
@@ -395,6 +421,7 @@ function makeRoleActionCard(roleId, lastSeen, buttons) {
   left.appendChild(title);
 
   const meta = document.createElement("div");
+  meta.dataset.roleLastseen = roleId;
   meta.className = "text-xs opacity-70";
   meta.innerText = lastSeen.text;
 
