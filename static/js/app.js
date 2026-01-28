@@ -14,6 +14,7 @@ async function refresh() {
   const data = await res.json();
 
   lastStateJson = data;
+  renderActionControlsFromLiveState();
 
   const pretty = JSON.stringify(data, null, 2);
   const statePre = document.getElementById("state-live");
@@ -265,6 +266,27 @@ async function confirmPendingAction() {
   await refresh();
 }
 
+function parseIsoToMs(iso) {
+  if (!iso || typeof iso !== "string") return null;
+  const ms = Date.parse(iso);
+  return Number.isFinite(ms) ? ms : null;
+}
+
+function formatLastSeen(roleId) {
+  const roles = (lastStateJson && lastStateJson.roles) ? lastStateJson.roles : {};
+  const roleObj = roles[roleId] || {};
+  const iso = roleObj.last_poll;
+
+  const ms = parseIsoToMs(iso);
+  if (ms === null) {
+    return { online: false, text: "never seen" };
+  }
+
+  const ageS = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+  const online = ageS <= 10;
+  return { online, text: `last seen ${ageS}s ago` };
+}
+
 // Exposed for the "Rebuild buttons" button
 function renderActionControlsFromLiveState() {
   const roles = (lastStateJson && lastStateJson.roles) ? lastStateJson.roles : {};
@@ -308,13 +330,15 @@ function renderActionControls(roleIds) {
   }
 
   for (const roleId of roleIds) {
-    const safeTitle = `Role: ${roleId}`;
-    host.appendChild(makeActionCard(safeTitle, [
-      { label: "Shutdown", cls: "btn-error", path: `/roles/${encodeURIComponent(roleId)}/shutdown` },
-      { label: "Reboot", cls: "btn-warning", path: `/roles/${encodeURIComponent(roleId)}/reboot` },
-      { label: "Update", cls: "btn-primary", path: `/roles/${encodeURIComponent(roleId)}/update` },
-    ]));
-  }
+  const ls = formatLastSeen(roleId);
+
+  // Title will be "Role: X" but with dot + last-seen text
+  host.appendChild(makeRoleActionCard(roleId, ls, [
+    { label: "Shutdown", cls: "btn-error", path: `/roles/${encodeURIComponent(roleId)}/shutdown` },
+    { label: "Reboot", cls: "btn-warning", path: `/roles/${encodeURIComponent(roleId)}/reboot` },
+    { label: "Update", cls: "btn-primary", path: `/roles/${encodeURIComponent(roleId)}/update` },
+  ]));
+}
 }
 
 function makeActionCard(title, buttons) {
@@ -340,6 +364,55 @@ function makeActionCard(title, buttons) {
   }
 
   body.appendChild(h);
+  body.appendChild(row);
+  card.appendChild(body);
+  return card;
+}
+
+function makeRoleActionCard(roleId, lastSeen, buttons) {
+  const card = document.createElement("div");
+  card.className = "card bg-base-200";
+
+  const body = document.createElement("div");
+  body.className = "card-body p-4";
+
+  const header = document.createElement("div");
+  header.className = "flex items-center justify-between gap-2";
+
+  const left = document.createElement("div");
+  left.className = "flex items-center gap-2";
+
+  const dot = document.createElement("span");
+  dot.className = "inline-block w-3 h-3 rounded-full";
+  // DaisyUI/Tailwind: bg-success / bg-error
+  dot.classList.add(lastSeen.online ? "bg-success" : "bg-error");
+
+  const title = document.createElement("div");
+  title.className = "font-bold";
+  title.innerText = `Role: ${roleId}`;
+
+  left.appendChild(dot);
+  left.appendChild(title);
+
+  const meta = document.createElement("div");
+  meta.className = "text-xs opacity-70";
+  meta.innerText = lastSeen.text;
+
+  header.appendChild(left);
+  header.appendChild(meta);
+
+  const row = document.createElement("div");
+  row.className = "mt-3 flex flex-wrap gap-2";
+
+  for (const b of buttons) {
+    const btn = document.createElement("button");
+    btn.className = `btn btn-sm ${b.cls}`;
+    btn.innerText = b.label;
+    btn.onclick = () => openActionModal(b.label + ` (${roleId})`, b.path, b.cls === "btn-error");
+    row.appendChild(btn);
+  }
+
+  body.appendChild(header);
   body.appendChild(row);
   card.appendChild(body);
   return card;
