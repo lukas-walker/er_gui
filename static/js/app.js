@@ -147,6 +147,13 @@ function guessImageMime(b64) {
 }
 
 function renderImages(faceImages) {
+console.log("[renderImages] called:", {
+    isArray: Array.isArray(faceImages),
+    len: Array.isArray(faceImages) ? faceImages.length : null,
+    first: Array.isArray(faceImages) ? faceImages[0] : null,
+    last: Array.isArray(faceImages) ? faceImages[faceImages.length - 1] : null,
+  });
+
   const grid = document.getElementById("images-grid");
   const empty = document.getElementById("images-empty");
   const err = document.getElementById("images-error");
