@@ -65,6 +65,7 @@ async function refreshLogs() {
 }
 
 async function refreshExtendedState() {
+  console.log("[refreshExtendedState] called");
   const pre = document.getElementById("extended-state-json");
   if (!pre) return;
 
@@ -79,6 +80,10 @@ async function refreshExtendedState() {
     const ext = await res.json();
     lastExtendedJson = ext;
     pre.innerText = JSON.stringify(ext, null, 2);
+
+    console.log("[refreshExtendedState] ext keys:", Object.keys(ext || {}));
+    console.log("[refreshExtendedState] jobs len:", Array.isArray(ext?.extended_state?.face_jobs ?? ext?.face_jobs) ? (ext?.extended_state?.face_jobs ?? ext?.face_jobs).length : "not-array");
+
 
     // --- Images now live in extended_state.face_jobs ---
     const jobs = ext?.extended_state?.face_jobs ?? ext?.face_jobs ?? [];
@@ -498,6 +503,11 @@ async function doReset() {
 
     try {
       const ts = await refresh();
+
+      console.log("[tick] ts", ts, {
+          lastLogsLastChanged,
+          lastExtendedLastChanged,
+        });
 
       if (ts.logs_last_changed !== lastLogsLastChanged) {
         lastLogsLastChanged = ts.logs_last_changed;
