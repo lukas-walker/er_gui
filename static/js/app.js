@@ -81,27 +81,37 @@ async function refreshExtendedState() {
     pre.innerText = JSON.stringify(ext, null, 2);
 
     // --- Images now live in extended_state.face_jobs ---
-    const jobs = (ext && ext.extended_state) ? (ext.extended_state.face_jobs ?? []) : [];
+    const jobs = ext?.extended_state?.face_jobs ?? ext?.face_jobs ?? [];
     if (Array.isArray(jobs)) {
-      // only jobs that actually have an image
-      const withImg = jobs.filter(j => j && typeof j === "object" && typeof j.image_b64 === "string" && j.image_b64.length > 32);
+      // Build an array compatible with renderImages(): either strings or {image_b64,timestamp}
+      const faceImages = jobs
+        .map(j => {
+          if (!j) return null;
+          const b64 = typeof j.image_b64 === "string" ? j.image_b64 : null;
+          if (!b64) return null;
+          return {
+            image_b64: b64,
+            timestamp: j.created_at || j.claimed_at || null,
+            id: j.id || null,
+            status: j.status || null,
+          };
+        })
+        .filter(Boolean);
 
-      const last = withImg.length ? withImg[withImg.length - 1] : null;
-      const lastB64 = last && typeof last.image_b64 === "string" ? last.image_b64 : "";
-      const sig = withImg.length + ":" + lastB64.slice(0, 64);
+      const last = faceImages[faceImages.length - 1];
+      const lastB64 =
+        last && typeof last === "object" && typeof last.image_b64 === "string"
+          ? last.image_b64
+          : "";
+      const sig = faceImages.length + ":" + lastB64.slice(0, 64);
 
-      if (sig !== lastFaceJobsSig) {
-        // adapt to existing renderer shape: [{timestamp, image_b64}, ...]
-        const items = withImg.map(j => ({
-          timestamp: (typeof j.created_at === "string" ? j.created_at : (typeof j.claimed_at === "string" ? j.claimed_at : "")),
-          image_b64: j.image_b64
-        }));
-        renderImages(items);
-        lastFaceJobsSig = sig;
+      if (sig !== lastFaceImagesSig) {
+        renderImages(faceImages);
+        lastFaceImagesSig = sig;
       }
 
       const countEl = document.getElementById("images-count");
-      if (countEl) countEl.innerText = `${withImg.length}`;
+      if (countEl) countEl.innerText = `${faceImages.length}`;
     }
   } catch (e) {
     pre.innerText = `Failed to load extended_state: ${e.message}`;
