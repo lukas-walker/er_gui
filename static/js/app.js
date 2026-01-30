@@ -1,6 +1,7 @@
 let liveEnabled = true;
 let lastLogsJson = null;
 let lastFaceImagesSig = "";
+let lastFaceJobsSig = "";
 let lastLogsLastChanged = null; // last seen state.logs_last_changed
 let lastExtendedLastChanged = null; // last seen state.extended_state_last_changed
 let lastExtendedJson = null;
@@ -57,22 +58,7 @@ async function refreshLogs() {
 
     if (pre) pre.innerText = JSON.stringify(logs, null, 2);
 
-    const faceImages = (logs?.clickwork?.["face-images"] ?? []);
-    if (Array.isArray(faceImages)) {
-      const last = faceImages[faceImages.length - 1];
-        const lastB64 =
-          typeof last === "string" ? last :
-          (last && typeof last === "object" && typeof last.image_b64 === "string")
-            ? last.image_b64
-            : "";
-        const sig = faceImages.length + ":" + lastB64.slice(0, 64);
-      if (sig !== lastFaceImagesSig) {
-        renderImages(faceImages);
-        lastFaceImagesSig = sig;
-      }
-      const countEl = document.getElementById("images-count");
-      if (countEl) countEl.innerText = `${faceImages.length}`;
-    }
+
   } catch (e) {
     if (pre) pre.innerText = `Failed to load logs: ${e.message}`;
   }
@@ -93,6 +79,30 @@ async function refreshExtendedState() {
     const ext = await res.json();
     lastExtendedJson = ext;
     pre.innerText = JSON.stringify(ext, null, 2);
+
+    // --- Images now live in extended_state.face_jobs ---
+    const jobs = (ext && ext.extended_state) ? (ext.extended_state.face_jobs ?? []) : [];
+    if (Array.isArray(jobs)) {
+      // only jobs that actually have an image
+      const withImg = jobs.filter(j => j && typeof j === "object" && typeof j.image_b64 === "string" && j.image_b64.length > 32);
+
+      const last = withImg.length ? withImg[withImg.length - 1] : null;
+      const lastB64 = last && typeof last.image_b64 === "string" ? last.image_b64 : "";
+      const sig = withImg.length + ":" + lastB64.slice(0, 64);
+
+      if (sig !== lastFaceJobsSig) {
+        // adapt to existing renderer shape: [{timestamp, image_b64}, ...]
+        const items = withImg.map(j => ({
+          timestamp: (typeof j.created_at === "string" ? j.created_at : (typeof j.claimed_at === "string" ? j.claimed_at : "")),
+          image_b64: j.image_b64
+        }));
+        renderImages(items);
+        lastFaceJobsSig = sig;
+      }
+
+      const countEl = document.getElementById("images-count");
+      if (countEl) countEl.innerText = `${withImg.length}`;
+    }
   } catch (e) {
     pre.innerText = `Failed to load extended_state: ${e.message}`;
   }
