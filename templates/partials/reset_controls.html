@@ -12,38 +12,36 @@
       </p>
 
       <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <!-- 1) Clickwork + Deepfake pipeline reset -->
         <button
           class="btn btn-error btn-outline"
-          onclick="openActionModal('Reset Clickwork+Deepfake pipeline', '/api/reset/clickwork_deepfake', true)"
+          onclick="openActionModal('Reset Clickwork+Deepfake pipeline', '/reset/clickwork_deepfake', true)"
         >
-          Reset Clickwork+Deepfake pipeline
+          A Clickwork+Deepfake
         </button>
 
-        <!-- 2) Full system reset (existing /reset) -->
+        <button
+          class="btn btn-error btn-outline"
+        >
+          B
+        </button>
+
+        <button
+          class="btn btn-warning btn-outline"
+        >
+          C
+        </button>
+
+        <button
+          class="btn btn-warning btn-outline"
+        >
+          D
+        </button>
+
         <button
           class="btn btn-error btn-outline"
           onclick="openActionModal('Full reset (default_state + extended + logs)', '/reset', true)"
         >
-          Full reset (defaults)
-        </button>
-
-        <!-- 3) Placeholder -->
-        <button
-          class="btn btn-error btn-outline"
-          disabled
-          title="TODO: implement endpoint on Pi server"
-        >
-          Reset #3 (TODO)
-        </button>
-
-        <!-- 4) Placeholder -->
-        <button
-          class="btn btn-error btn-outline"
-          disabled
-          title="TODO: implement endpoint on Pi server"
-        >
-          Reset #4 (TODO)
+          RESET ALL
         </button>
       </div>
 
