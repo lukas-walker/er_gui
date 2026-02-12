@@ -19,22 +19,22 @@
   {% include "partials/nav.html" %}
 
   <main class="mt-6">
-    {% call collapsible("reset-controls", "Resets", true) %}
+    {% call collapsible("reset-controls", "Reset", true) %}
       {% include "partials/reset_controls.html" %}
     {% endcall %}
-    {% call collapsible("reset-controls", "Resets", true) %}
+    {% call collapsible("system-controls", "System Controls", false) %}
         {% include "partials/system_controls.html" %}
     {% endcall %}
-        {% call collapsible("reset-controls", "Resets", true) %}
+        {% call collapsible("advanced-controls", "Advanced Control", false) %}
     {% include "partials/advanced_controls.html" %}
         {% endcall %}
-    {% call collapsible("reset-controls", "Resets", true) %}
+    {% call collapsible("logs-controls", "Logs", false) %}
         {% include "partials/logs.html" %}
     {% endcall %}
-    {% call collapsible("reset-controls", "Resets", true) %}
+    {% call collapsible("extended-state-controls", "Extended State", false) %}
         {% include "partials/extended_state.html" %}
     {% endcall %}
-    {% call collapsible("reset-controls", "Resets", true) %}
+    {% call collapsible("images-controls", "Live Images", false) %}
         {% include "partials/deepfake-images.html" %}
     {% endcall %}
   </main>
