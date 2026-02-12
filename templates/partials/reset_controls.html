@@ -1,0 +1,55 @@
+<section id="reset-controls" class="mb-6 scroll-mt-24">
+  <h2 class="text-2xl font-bold mb-3">Resets</h2>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="card-title">Puzzle resets</h3>
+      </div>
+
+      <p class="opacity-70 text-sm mt-1">
+        These are high-impact operations. All actions require confirmation.
+      </p>
+
+      <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <!-- 1) Clickwork + Deepfake pipeline reset -->
+        <button
+          class="btn btn-error btn-outline"
+          onclick="openActionModal('Reset Clickwork+Deepfake pipeline', '/api/reset/clickwork_deepfake', true)"
+        >
+          Reset Clickwork+Deepfake pipeline
+        </button>
+
+        <!-- 2) Full system reset (existing /reset) -->
+        <button
+          class="btn btn-error btn-outline"
+          onclick="openActionModal('Full reset (default_state + extended + logs)', '/reset', true)"
+        >
+          Full reset (defaults)
+        </button>
+
+        <!-- 3) Placeholder -->
+        <button
+          class="btn btn-error btn-outline"
+          disabled
+          title="TODO: implement endpoint on Pi server"
+        >
+          Reset #3 (TODO)
+        </button>
+
+        <!-- 4) Placeholder -->
+        <button
+          class="btn btn-error btn-outline"
+          disabled
+          title="TODO: implement endpoint on Pi server"
+        >
+          Reset #4 (TODO)
+        </button>
+      </div>
+
+      <p class="opacity-70 text-sm mt-3">
+        Tip: the first button calls <code>POST /reset/clickwork_deepfake</code> on the Pi via the proxy.
+      </p>
+    </div>
+  </div>
+</section>

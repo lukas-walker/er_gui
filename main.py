@@ -100,6 +100,13 @@ def reset(_auth=Depends(auth)):
 def reset(_auth=Depends(auth)):
     return requests.post(f"{BASE_URL}/reset").json()
 
+@app.post("/api/reset/clickwork_deepfake")
+def reset_clickwork_deepfake(_auth=Depends(auth)):
+    r = requests.post(f"{BASE_URL}/reset/clickwork_deepfake", timeout=15)
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
+    return r.json()
+
 @app.get("/api/snapshot")
 def api_snapshot(_auth=Depends(auth)):
     target_url = f"{BASE_URL}/client/video/frame"
