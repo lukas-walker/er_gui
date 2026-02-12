@@ -11,14 +11,14 @@
 
       <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
         <button
-          class="btn btn-error btn-outline"
+          class="btn btn-warning btn-outline"
           onclick="openActionModal('Reset Clickwork+Deepfake pipeline', '/reset/clickwork_deepfake', true)"
         >
           A Clickwork+Deepfake
         </button>
 
         <button
-          class="btn btn-error btn-outline"
+          class="btn btn-warning btn-outline"
           onclick="openActionModal('Reset Clickwork+Deepfake pipeline', '/reset/chatbot_systemprompt_facialrecognition', true)"
         >
           B Chatbot + Systemprompt + Facial Recognition
@@ -44,10 +44,6 @@
           RESET ALL
         </button>
       </div>
-
-      <p class="opacity-70 text-sm mt-3">
-        Tip: the first button calls <code>POST /reset/clickwork_deepfake</code> on the Pi via the proxy.
-      </p>
     </div>
   </div>
 </section>
