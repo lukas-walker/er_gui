@@ -114,6 +114,13 @@ def chatbot_systemprompt_facialrecognition(_auth=Depends(auth)):
         raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
     return r.json()
 
+@app.post("/api/reset/jobs_prinzipien")
+def chatbot_systemprompt_facialrecognition(_auth=Depends(auth)):
+    r = requests.post(f"{BASE_URL}/reset/jobs_prinzipien", timeout=15)
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Pi returned {r.status_code}: {r.text}")
+    return r.json()
+
 @app.get("/api/snapshot")
 def api_snapshot(_auth=Depends(auth)):
     target_url = f"{BASE_URL}/client/video/frame"
