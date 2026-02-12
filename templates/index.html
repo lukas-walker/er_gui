@@ -14,16 +14,29 @@
 </head>
 
 <body class="min-h-screen bg-base-300 text-base-content p-4">
+  {% from "partials/_collapsible.html" import collapsible %}
 
   {% include "partials/nav.html" %}
 
   <main class="mt-6">
-    {% include "partials/reset_controls.html" %}
-    {% include "partials/system_controls.html" %}
+    {% call collapsible("reset-controls", "Resets", true) %}
+      {% include "partials/reset_controls.html" %}
+    {% endcall %}
+    {% call collapsible("reset-controls", "Resets", true) %}
+        {% include "partials/system_controls.html" %}
+    {% endcall %}
+        {% call collapsible("reset-controls", "Resets", true) %}
     {% include "partials/advanced_controls.html" %}
-    {% include "partials/logs.html" %}
-    {% include "partials/extended_state.html" %}
-    {% include "partials/deepfake-images.html" %}
+        {% endcall %}
+    {% call collapsible("reset-controls", "Resets", true) %}
+        {% include "partials/logs.html" %}
+    {% endcall %}
+    {% call collapsible("reset-controls", "Resets", true) %}
+        {% include "partials/extended_state.html" %}
+    {% endcall %}
+    {% call collapsible("reset-controls", "Resets", true) %}
+        {% include "partials/deepfake-images.html" %}
+    {% endcall %}
   </main>
 
   {% include "partials/modals.html" %}

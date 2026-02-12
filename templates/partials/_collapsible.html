@@ -1,0 +1,14 @@
+{# templates/partials/_collapsible.html #}
+{% macro collapsible(section_id, title, open_by_default=false, extra_classes="") %}
+<section id="{{ section_id }}" class="mb-6 scroll-mt-24 {{ extra_classes }}">
+  <div class="collapse collapse-arrow bg-base-100 shadow-xl">
+    <input type="checkbox" {% if open_by_default %}checked{% endif %} />
+    <div class="collapse-title text-2xl font-bold">
+      {{ title }}
+    </div>
+    <div class="collapse-content">
+      {{ caller() }}
+    </div>
+  </div>
+</section>
+{% endmacro %}
