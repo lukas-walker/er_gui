@@ -22,19 +22,19 @@
     {% call collapsible("reset-controls", "Reset", true) %}
       {% include "partials/reset_controls.html" %}
     {% endcall %}
-    {% call collapsible("system-controls", "System Controls", false) %}
+    {% call collapsible("system-controls", "System Controls", true) %}
         {% include "partials/system_controls.html" %}
     {% endcall %}
-        {% call collapsible("advanced-controls", "Advanced Control", false) %}
+        {% call collapsible("advanced-controls", "Advanced Control", true) %}
     {% include "partials/advanced_controls.html" %}
         {% endcall %}
-    {% call collapsible("logs-controls", "Logs", false) %}
+    {% call collapsible("logs-controls", "Logs", true) %}
         {% include "partials/logs.html" %}
     {% endcall %}
-    {% call collapsible("extended-state-controls", "Extended State", false) %}
+    {% call collapsible("extended-state-controls", "Extended State", true) %}
         {% include "partials/extended_state.html" %}
     {% endcall %}
-    {% call collapsible("images-controls", "Live Images", false) %}
+    {% call collapsible("images-controls", "Live Images", true) %}
         {% include "partials/deepfake-images.html" %}
     {% endcall %}
   </main>
