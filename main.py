@@ -17,7 +17,7 @@ security = HTTPBasic()
 USERNAME = os.getenv("GUI_USERNAME", "admin")
 PASSWORD = os.getenv("GUI_PASSWORD", "escape123")
 
-BASE_URL = os.getenv("PI_BASE_URL", "http://83.228.207.123:8200")
+BASE_URL = os.getenv("PI_BASE_URL", "http://83.228.219.8:8200")
 
 def auth(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, USERNAME)
