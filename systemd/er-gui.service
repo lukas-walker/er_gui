@@ -1,0 +1,25 @@
+# read README for how to set this up locally!
+
+# sudo cp /opt/er_gui/systemd/er-gui.service /etc/systemd/system/er-gui.service
+# sudo systemctl daemon-reload
+# sudo systemctl enable --now er-gui.service
+# sudo systemctl status er-gui.service
+# journalctl -u er-gui.service -f
+
+
+[Unit]
+Description=Escape Room GUI Phaenomena
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/er_gui
+EnvironmentFile=/opt/er_gui/.env
+ExecStart=/opt/er_gui/.venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8090
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

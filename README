@@ -1,4 +1,6 @@
-the web gui for the escape room
+# the web gui for the escape room
+
+## Phaenomena Version
 
 
 
@@ -16,3 +18,44 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 ```
+
+
+
+# Installation on Pi Server for local devices
+
+```
+cd /opt
+sudo git clone git@github.com:lukas-walker/er_gui.git
+
+sudo python3 -m venv .venv
+sudo .venv/bin/pip install --upgrade pip
+sudo .venv/bin/pip install -r requirements.txt
+
+# edit password later, make sure port matches the one the server is listening to
+sudo tee /opt/er_gui/.env >/dev/null <<'EOF'
+GUI_USERNAME=admin
+GUI_PASSWORD=escape123
+PI_BASE_URL=http://127.0.0.1:8001
+EOF
+
+# verify they exist
+ls -la /opt/er_gui/.venv
+cat /opt/er_gui/.env
+
+
+# Test it
+
+set -a
+source .env
+set +a
+
+echo "$GUI_USERNAME"
+echo "$GUI_PASSWORD"
+echo "$PI_BASE_URL"
+
+# choose any port that isn't used at the moment
+sudo -E .venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8090
+```
+
+
+
